@@ -1,0 +1,1459 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>유니스트 실험 대신 전해드립니다</title>
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
+        integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+
+    <!-- jQuery and JS bundle w/ Popper.js -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous">
+    </script>
+
+    <script>
+        window.currentUser = { currentDay : new Date()};
+        function showPopup(x) {
+            window.open("content_detail/" + x, "a", "width=600, height=600, left=100, top=50");
+        }
+
+        function showPopup1(x) {
+            window.open("content_explain/" + x, "a", "width=1200, height=900, left=100, top=50");
+        }
+
+        function myFunction(today) {
+            var dayOfMonth = today.getDate();
+            var theYear = today.getFullYear();
+            var theMonth = today.getMonth();
+            var theDate = today.getDate();
+            var theDayOfWeek = today.getDay();
+            var thisWeek = [];
+            for (var i = 0; i < 7; i++) {
+                var resultDay = new Date(theYear, theMonth, theDate + (i - theDayOfWeek));
+                var yyyy = resultDay.getFullYear();
+                var mm = Number(resultDay.getMonth()) + 1;
+                var dd = resultDay.getDate();
+
+                mm = String(mm).length === 1 ? '0' + mm : mm;
+                dd = String(dd).length === 1 ? '0' + dd : dd;
+
+                thisWeek[i] = yyyy + '_' + mm + '_' + dd;
+            }
+
+            $(".nine").css("display", "none");
+            $(".ten").css("display", "none");
+            $(".eleven").css("display", "none");
+            $(".twelve").css("display", "none");
+            $(".thirteen").css("display", "none");
+            $(".fourteen").css("display", "none");
+            $(".fifteen").css("display", "none");
+            $(".sixteen").css("display", "none");
+            $(".seventeen").css("display", "none");
+            $(".eighteen").css("display", "none");
+
+            for (var w = 0; w < 7; w++) {
+                var eDate = document.querySelectorAll("#id_" + thisWeek[w]);
+                var k = eDate.length;
+                for (var y = 0; y < k; y++) {
+                    eDate[y].style.display = 'block';
+                }
+            }
+            return thisWeek;
+        }
+
+        function lastWeek(today){
+            var dayOfMonth = today.getDate();
+            today.setDate(dayOfMonth - 7);
+            window.currentUser.currentDay = today;
+            return today;
+        }
+
+        function nextWeek(today) {
+            var dayOfMonth = today.getDate();
+            today.setDate(dayOfMonth + 7);
+            window.currentUser.currentDay = today;
+            return today;
+        }
+    </script>
+
+</head>
+
+<body>
+    <div class="title">
+        <div class="letter">
+            유니스트 실험 대신 전해드립니다
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        window.onload = function () {
+            var content = 0
+            $('.content').hide();
+            document.getElementById('change').innerHTML = '컨텐츠 별로 보기';
+            document.getElementById('change').onclick = function () {
+                if (content == 1) {
+                    $('.content').hide();
+                    $('.calendar').show();
+                    content = 0;
+                    document.getElementById('change').innerHTML = '컨텐츠 별로 보기'
+                } else if (content == 0) {
+                    $('.content').show();
+                    $('.calendar').hide();
+                    content = 1;
+                    document.getElementById('change').innerHTML = '캘린더 별로 보기'
+                }
+
+            }
+            
+        };
+    </script>
+
+    <nav class="nav-container">
+        <li class="nav-item"><a href="{% url 'create' %}" class = "creator">실험 주최하기</a></li>
+        <li class="nav-item"><span id="change">캘린더로 보기</span></li>
+        <li class="nav-item"><a href="{% url 'maker' %}">제작자 소개</a></li>
+        <li class="nav-item"><button type="button" class="btn btn-outline-warning" onclick="myFunction(lastWeek(window.currentUser.currentDay));">&#10094; 이전</button></li>
+        <li class="nav-item-date">
+            <script>
+                var thiswk= myFunction(window.currentUser.currentDay);
+                document.write(thiswk[0]+'~'+thiswk[6]);
+            </script>
+        </li>
+        <li class="nav-item"><button type="button" class="btn btn-outline-warning" onclick="myFunction(nextWeek(window.currentUser.currentDay));">다음 &#10095;</button></li>
+    </nav>
+    <div class="calendar">
+        <div class="timetable">
+            <div class="weekofday sunday">
+                <div class="h3">일요일</div>
+                {% for timeslot in sunday_timeslots %}
+                {% if timeslot.starttime|date:"h" == '09' %}
+                <div class="nine" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}} {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                            if(time_slots.length>1){
+                                for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.width=(time_slots[i].style.width)/time_slots.length;
+                            }
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '10' %}
+                <div class="ten" id="id_{{timeslot.date|date:'Y-m-d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '11' %}
+                <div class="eleven" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '12' %}
+                <div class=" twelve" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '01' %}
+                <div class=" thirteen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '02' %}
+                <div class=" fourteen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '03' %}
+                <div class=" fifteen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '04' %}
+                <div class=" sixteen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '05' %}
+                <div class=" seventeen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '06' %}
+                <div class=" eighteen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+
+            <div class="weekofday monday">
+                <div class="h3">월요일</div>
+                {% for timeslot in monday_timeslots %}
+                {% if timeslot.starttime|date:"h" == '09' %}
+                <div class=" nine" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '10' %}
+                <div class=" ten " id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '11' %}
+                <div class=" eleven" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}} name="monday_eleven"
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '12' %}
+                <div class=" twelve" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}} 
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '01' %}
+                <div class=" thirteen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '02' %}
+                <div class=" fourteen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '03' %}
+                <div class=" fifteen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '04' %}
+                <div class=" sixteen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '05' %}
+                <div class=" seventeen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '06' %}
+                <div class=" eighteen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+
+            <div class="weekofday tuesday">
+                <div class="h3">화요일</div>
+                {% for timeslot in tuesday_timeslots %}
+                {% if timeslot.starttime|date:"h" == '09' %}
+                <div class=" nine" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '10' %}
+                <div class=" ten" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '11' %}
+                <div class=" eleven" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '12' %}
+                <div class=" twelve" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '01' %}
+                <div class=" thirteen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '02' %}
+                <div class=" fourteen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '03' %}
+                <div class=" fifteen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '04' %}
+                <div class=" sixteen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '05' %}
+                <div class=" seventeen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '06' %}
+                <div class=" eighteen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+
+            <div class="weekofday wednesday">
+                <div class="h3">수요일</div>
+                {% for timeslot in wednesday_timeslots %}
+
+                {% if timeslot.starttime|date:"h" == '09' %}
+                <div class="nine" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class=timeslotbutton id=id_{{timeslot.content.id}} onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '10' %}
+                <div class=" ten" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '11' %}
+                <div class=" eleven" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '12' %}
+                <div class=" twelve" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '01' %}
+                <div class=" thirteen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '02' %}
+                <div class=" fourteen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '03' %}
+                <div class=" fifteen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '04' %}
+                <div class=" sixteen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '05' %}
+                <div class="seventeen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+/*
+                            var same_time = document.querySelectorAll("#id_{{timeslot.date|date:'Y_m_d'}}");
+                            var same_time2 = document.querySelectorAll(".seventeen");
+
+
+                            console.log(lst);
+                            
+                            if(same_time2.length>1){
+                                alert("Sfda");
+                                for(var i=0;i<same_time.length;i++){
+                                same_time2[i].style.width=(same_time2[i].style.width)/same_time2.length;
+                                }
+                                }
+*/
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '06' %}
+                <div class=" eighteen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            <div class="weekofday thursday">
+                <div class="h3">목요일</div>
+                {% for timeslot in thursday_timeslots %}
+                {% if timeslot.starttime|date:"h" == '09' %}
+                <div class=" nine" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '10' %}
+                <div class=" ten" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '11' %}
+                <div class=" eleven" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '12' %}
+                <div class=" twelve" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '01' %}
+                <div class=" thirteen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '02' %}
+                <div class=" fourteen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '03' %}
+                <div class=" fifteen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '04' %}
+                <div class=" sixteen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '05' %}
+                <div class=" seventeen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '06' %}
+                <div class=" eighteen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            <div class="weekofday friday">
+                <div class="h3">금요일</div>
+                {% for timeslot in friday_timeslots %}
+                {% if timeslot.starttime|date:"h" == '09' %}
+                <div class=" nine" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '10' %}
+                <div class=" ten" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '11' %}
+                <div class=" eleven" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '12' %}
+                <div class=" twelve" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '01' %}
+                <div class=" thirteen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '02' %}
+                <div class=" fourteen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '03' %}
+                <div class=" fifteen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '04' %}
+                <div class=" sixteen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '05' %}
+                <div class=" seventeen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button>
+                        <script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '06' %}
+                <div class=" eighteen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}}
+                        onclick="showPopup({{timeslot.id}});">{{timeslot.content.title}}
+                        {{timeslot.starttime}}</button><script>
+                            var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                            var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                            var running_time = (now.getTime()-old.getTime())/3600000;
+                            var nopi = running_time*5+'vh';
+                            var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                            for(var i=0;i<time_slots.length;i++){
+                                time_slots[i].style.height=nopi;
+                            }
+                        </script>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+
+            <div class="weekofday saturday">
+                <div class="h3">토요일</div>
+                {% for timeslot in saturday_timeslots %}
+                {% if timeslot.starttime|date:"h" == '09' %}
+                <div class="nine" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}} onclick="showPopup({{timeslot.id}});">
+                    {{timeslot.content.title}} {{timeslot.starttime}}
+                    </button>
+                    <script>
+                        var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                        var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                        var running_time = (now.getTime()-old.getTime())/3600000;
+                        var nopi = running_time*5+'vh';
+                        var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                        for(var i=0;i<time_slots.length;i++){
+                            time_slots[i].style.height=nopi;
+                        }
+                    </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '10' %}
+                <div class="ten" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}} onclick="showPopup({{timeslot.id}});">
+                        {{timeslot.content.title}} {{timeslot.starttime}}
+                    </button>
+                    <script>
+                        var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                        var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                        var running_time = (now.getTime()-old.getTime())/3600000;
+                        var nopi = running_time*5+'vh';
+                        var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                        for(var i=0;i<time_slots.length;i++){
+                            time_slots[i].style.height=nopi;
+                        }
+                    </script>
+                </div>
+
+
+                {% elif timeslot.starttime|date:"h" == '11' %}
+                <div class=" eleven" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}} onclick="showPopup({{timeslot.id}});">
+                        {{timeslot.content.title}} {{timeslot.starttime}}
+                    </button>
+                    <script>
+                        var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                        var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                        var running_time = (now.getTime()-old.getTime())/3600000;
+                        var nopi = running_time*5+'vh';
+                        var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                        for(var i=0;i<time_slots.length;i++){
+                            time_slots[i].style.height=nopi;
+                        }
+                    </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '12' %}
+                <div class=" twelve" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}} onclick="showPopup({{timeslot.id}});">
+                        {{timeslot.content.title}} {{timeslot.starttime}}
+                    </button>
+                    <script>
+                        var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                        var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                        var running_time = (now.getTime()-old.getTime())/3600000;
+                        var nopi = running_time*5+'vh';
+                        var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                        for(var i=0;i<time_slots.length;i++){
+                            time_slots[i].style.height=nopi;
+                        }
+                    </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '01' %}
+                <div class=" thirteen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}} onclick="showPopup({{timeslot.id}});">
+                        {{timeslot.content.title}} {{timeslot.starttime}}
+                    </button>
+                    <script>
+                        var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                        var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                        var running_time = (now.getTime()-old.getTime())/3600000;
+                        var nopi = running_time*5+'vh';
+                        var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                        for(var i=0;i<time_slots.length;i++){
+                            time_slots[i].style.height=nopi;
+                        }
+                    </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '02' %}
+                <div class=" fourteen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}} onclick="showPopup({{timeslot.id}});">
+                        {{timeslot.content.title}} {{timeslot.starttime}}
+                    </button>
+                    <script>
+                        var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                        var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                        var running_time = (now.getTime()-old.getTime())/3600000;
+                        var nopi = running_time*5+'vh';
+                        var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                        for(var i=0;i<time_slots.length;i++){
+                            time_slots[i].style.height=nopi;
+                        }
+                    </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '03' %}
+                <div class=" fifteen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}} onclick="showPopup({{timeslot.id}});">
+                        {{timeslot.content.title}} {{timeslot.starttime}}
+                    </button>
+                    <script>
+                        var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                        var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                        var running_time = (now.getTime()-old.getTime())/3600000;
+                        var nopi = running_time*5+'vh';
+                        var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                        for(var i=0;i<time_slots.length;i++){
+                            time_slots[i].style.height=nopi;
+                        }
+                    </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '04' %}
+                <div class=" sixteen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}} onclick="showPopup({{timeslot.id}});">
+                        {{timeslot.content.title}} {{timeslot.starttime}}
+                    </button>
+                    <script>
+                        var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                        var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                        var running_time = (now.getTime()-old.getTime())/3600000;
+                        var nopi = running_time*5+'vh';
+                        var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                        for(var i=0;i<time_slots.length;i++){
+                            time_slots[i].style.height=nopi;
+                        }
+                    </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '05' %}
+                <div class=" seventeen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}} onclick="showPopup({{timeslot.id}});">
+                        {{timeslot.content.title}} {{timeslot.starttime}}
+                    </button>
+                    <script>
+                        var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                        var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                        var running_time = (now.getTime()-old.getTime())/3600000;
+                        var nopi = running_time*5+'vh';
+                        var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                        for(var i=0;i<time_slots.length;i++){
+                            time_slots[i].style.height=nopi;
+                        }
+                    </script>
+                </div>
+
+                {% elif timeslot.starttime|date:"h" == '06' %}
+                <div class="eighteen" id="id_{{timeslot.date|date:'Y_m_d'}}">
+                    <button type="button" class="timeslotbutton" id=id_{{timeslot.content.id}} onclick="showPopup({{timeslot.id}});">
+                        {{timeslot.content.title}} {{timeslot.starttime}}
+                    </button>
+                    <script>
+                        var old = new Date(2020,10,24,{{ timeslot.starttime|date:'H'}}, {{ timeslot.starttime|date:'i'}},00);
+                        var now = new Date(2020,10,24,{{ timeslot.endtime|date:'H'}}, {{ timeslot.endtime|date:'i'}},00);
+                        var running_time = (now.getTime()-old.getTime())/3600000;
+                        var nopi = running_time*5+'vh';
+                        var time_slots = document.querySelectorAll('#id_{{timeslot.content.id}}');
+                        for(var i=0;i<time_slots.length;i++){
+                            time_slots[i].style.height=nopi;
+                        }
+                    </script>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        <br>
+        <br>
+        <br>
+    </div>
+
+    <div class="content">
+        {% for content in all_contents %}
+        <button type="button" class="btn btn-primary" id="content_{{content.id}}" data-toggle="modal" data-target="#staticBackdrop"
+            onclick="showPopup1({{content.id}})">
+            {{content.title}}
+        </button>
+    
+
+        {% endfor %}
+    </div>
+    {% for content in all_contents %}
+    <script>
+        var color_before = Math.round(Math.random() * 0xFFFFFF).toString(16);
+        var colorCode = "#" + color_before;
+        var eList = document.querySelectorAll("#id_{{content.id}}");
+        var n = eList.length;
+        for (var x = 0; x < n; x++) {
+            eList[x].style.backgroundColor = colorCode;
+        }
+    </script>
+    {% endfor %}
+
+
+</body>
+<script type="text/javascript">
+    var theYear = window.currentUser.currentDay.getFullYear();
+    var theMonth = window.currentUser.currentDay.getMonth();
+    var theDate = window.currentUser.currentDay.getDate();
+    var theDayOfWeek = window.currentUser.currentDay.getDay();
+    var thisWeek = [];
+    for (var i = 0; i < 7; i++) {
+        var resultDay = new Date(theYear, theMonth, theDate + (i - theDayOfWeek));
+        var yyyy = resultDay.getFullYear();
+        var mm = Number(resultDay.getMonth()) + 1;
+        var dd = resultDay.getDate();
+
+        mm = String(mm).length === 1 ? '0' + mm : mm;
+        dd = String(dd).length === 1 ? '0' + dd : dd;
+
+        thisWeek[i] = yyyy + '_' + mm + '_' + dd;
+    }
+    $(".nine").css("display", "none");
+    $(".ten").css("display", "none");
+    $(".eleven").css("display", "none");
+    $(".twelve").css("display", "none");
+    $(".thirteen").css("display", "none");
+    $(".fourteen").css("display", "none");
+    $(".fifteen").css("display", "none");
+    $(".sixteen").css("display", "none");
+    $(".seventeen").css("display", "none");
+    $(".eighteen").css("display", "none");
+    //$("#content").css("display","none");
+
+    for (var w = 0; w < 7; w++) {
+        var eDate = document.querySelectorAll("#id_" + thisWeek[w]);
+        //var eDate2 = document.querySelectorAll("#content_"+thisWeek[])
+        var k = eDate.length;
+        for (var y = 0; y < k; y++) {
+            eDate[y].style.display = 'block';
+        }
+    }
+
+</script>
+{% for timeslot in all_timeslots %}
+    
+{% endfor %}

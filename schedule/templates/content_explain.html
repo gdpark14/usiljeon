@@ -1,0 +1,21 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{% static 'css/content_detail.css' %}">
+</head>
+<body>
+    <div class="content_detail">
+        <h2>{{content.title}}</h2>
+        <p>주최자 : {{content.creator}}</p>
+        <p>연락처 : {{content.contact}}</p>
+        <p>위치 : {{content.location}}</p>
+        <br>
+        <a href="{% url 'time_detail' content.id %}">클릭 here!</a>
+    </div>
+</body>
+</html>

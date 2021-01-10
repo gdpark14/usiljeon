@@ -1,0 +1,12 @@
+@import url(//fonts.googleapis.com/earlyaccess/nanumgothic.css); 
+.nanumgothic * { font-family: 'Nanum Gothic', sans-serif; }
+
+.title, .info, .form, .user_cancel{
+    font-family: 'Nanum Gothic', sans-serif;
+    text-align: center;
+}
+
+.title{
+    margin-top:7vh;
+    font-size: 30px;
+}

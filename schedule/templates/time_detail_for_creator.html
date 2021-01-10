@@ -1,0 +1,66 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel='stylesheet' href="{% static 'css/time_detail_for_creator.css' %}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+</head>
+
+<body>
+    <h3 class="title">{{timeslot.content.title}}</h3>
+    <div class="form">
+        <form action="{% url 'content_revise' content_id %}" method="post">
+            {% csrf_token %}
+            {{content_form.as_p}}
+
+            <input type="submit" value="OK">
+        </form>
+    </div>
+
+    <form action="{% url 'content_delete' content_id%}" method="post">
+    {% csrf_token %}
+    <div class="cancel">
+            <button type="submit" name="content_delete" value="content_delete">제작취소</button>
+    </div>
+    </form>
+
+    <form action="{% url 'time_make' content_id%}" method="post">
+    {% csrf_token %}
+    <div class="time_make">
+            <button type="submit" name="time_make" value="time_make">시간추가</button>
+    </div>
+    </form>
+
+    <div class="stop">
+        {% for timeslot in timeslots %}
+        <div class="timeslotinfo">
+            {{timeslot.date}} {{timeslot.starttime}} {{timeslot.endtime}} {{timeslot.day_of_week}} {{timeslot.isUsed}}
+        </div>
+        
+        <form action="{% url 'close' timeslot.id content_id%}" method="post">
+            {% csrf_token %}
+            <div class="timeslot">
+                <button type="submit" name="close" value="close">막기</button>
+            </div>
+        </form>
+
+        <form action="{% url 'time_revise' timeslot.id content_id%}" method="post">
+            {% csrf_token %}
+            <div class="timeslot">
+                <button type="submit" name="close" value="close">수정</button>
+            </div>
+        </form>
+        <br>
+
+    {% endfor %}
+
+    </div>
+
+</body>
+
+</html>

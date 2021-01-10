@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{% static 'css/usertemp_revise.css' %}">
+</head>
+
+<body>
+    <h3 class="title">{{timeslot.content.title}}</h3>
+    <div class="info">{{timeslot.date}} <br>{{timeslot.starttime}} ~ {{timeslot.endtime}}</div>
+
+    <div class="form">
+        <form action="{% url 'user_revise' timeslot.id %}" method="post">
+            {% csrf_token %}
+            {{usertemp.as_p}}
+
+            {{timeslot}}
+            <input type="submit" value="OK">
+        </form>
+    </div>
+
+    <div class="user_cancel">
+        <a href="{% url 'time_delete' timeslot.id %}">
+            <button>신청취소</button>
+        </a>
+    </div>
+</body>
+
+</html>
